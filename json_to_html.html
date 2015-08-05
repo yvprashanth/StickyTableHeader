@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+   <head>
+      <meta charset="utf-8">
+     
+      <title>JSON to HTML</title>
+      
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.17.2/build/cssreset/cssreset-min.css">
+   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+   <!-- <link rel="stylesheet" type="text/css" href="css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="css/demo.css" />
+    <link rel="stylesheet" type="text/css" href="css/component.css" /> -->
+    <link rel="stylesheet" type="text/css" href="css/stickysort.css" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+      
+      
+   </head>
+   <body>
+      <br/>
+      <div class="title">
+         <center>
+            <h1 class="title">JSON to HTML 
+            </h1>
+         </center>
+      </div>
+      <section id="container" >
+         <section id="component">
+            <section class="wrapper">
+                
+                           
+                            <select id = "project">
+  
+</select>
+<button type="button" class="btn btn-success" id = "show" onclick = "Show()">show</button>
+<button type="button" class="btn btn-danger" id = "hide" onclick = "Hide()">hide</button>
+<br/><br>
+
+                          <div class="sticky-wrap">
+                          <table id="tableForJsonData" class = "table table-bordered sticky-enabled">
+                          
+
+       </table>
+        </div>
+            
+         </section>
+      </section>
+      </section>
+      
+      
+     
+	   <script src="Scripts/jquery.min.js"></script>
+     <script src="js/jquery.ba-throttle-debounmin.js"></script>
+     <script src="js/jquery.stickysort.min.js"></script>
+      
+      <script type="text/javascript">
+      
+      
+    function addColumnHeaders(list) {
+        var columnSet = [];
+        var header$ = $('<tr/>');
+     
+        for (var i = 0; i < list.length; i++) {
+            var rowHash = list[i];
+            for (var key in rowHash) {
+                if ($.inArray(key, columnSet) == -1) {
+                    columnSet.push(key);
+                    header$.append($('<td/>').html(key));
+                }
+            }
+        }
+        $("#tableForJsonData").append(header$);
+     
+        return columnSet;
+    }
+      function transpose() {
+          
+                          var $this = $("#tableForJsonData");
+                          
+                          
+                          var count = 0;
+                          var newrows = [];
+                          $this.find("tr").each(function(){
+                                                var i = 0;
+                                                $(this).find("td").each(function(){
+                                                                        i++;
+                                                                        if(newrows[i] === undefined) { 
+                                                                        
+                                                                        newrows[i] = $("<tr></tr>");
+                                                                        
+                                                                         }
+                                                                        newrows[i].append($(this));
+                                                                        });
+                                                });
+                          $this.find("tr").remove();
+                          
+                         
+                          
+                          $.each(newrows, function(){
+                
+                          		
+                                 $this.append(this);
+                                 
+                                 });
+                          
+                          
+
+
+      }
+     
+
+$(document).ready(function(){
+    	$("#tableForJsonData td").hover(function(){
+    		var i = $(this).index();
+    		var a = $('td:first', $(this).parents('tr')).text();
+    		 
+    		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();
+   			
+    		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
+    	}, function(){
+    		
+    		$(this).find("span").remove();
+    		$(this).find("br").remove();
+    		
+    	});
+    });
+	
+		$.getJSON("Scripts/values.json", function (data) {
+        var columns = addColumnHeaders(data);
+        
+              for (var i = 0; i < data.length; i++) {
+              
+              var iteration = i;
+              var row$ = $('<tr/>');
+              
+              for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+              
+              var cellValue = data[i][columns[colIndex]];
+              
+              if (cellValue == null) { cellValue = ""; }
+              
+              //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
+               //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
+              if(colIndex == 0)
+              {
+                row$.append($('<td/>').html(cellValue));
+              }
+              else
+              {
+                row$.append($('<td/>').html(cellValue));
+              }
+              
+              }
+              $("#tableForJsonData").append(row$);
+        }
+        
+            transpose();
+            addCheckbox();
+
+            $("#headerId").css("color", "red");
+            $("#headerId").css("font-weight", "bold");
+            $("#headerId").css("font-size", "20px");
+            $("tr:first-child td").each(function() {
+                $(this).replaceWith('<th>' + $(this).text() + '</th>'); 
+            });
+            var firstHeader = $('#tableForJsonData tr:first');
+            // var tempBlah = '<thead>' + firstHeader[0] + '</thead>';
+            $('table').each(function(){
+                $(this).prepend('<thead></thead>')
+                $(this).find('thead').append($(this).find("tr:eq(0)"));
+            });
+
+            $('table').stickySort();
+            // $('#tableForJsonData table').stickySort();
+            // $('#tableForJsonData tr:first').remove();
+    });
+	
+    
+    
+    function addCheckbox()
+    {
+    	var option = "<option value=\"0\"> All Projects </option>";
+    	dropdown(option);
+    	var iterator = 0;
+    	var row = $("#tableForJsonData").find("tr:first");
+    	row.attr('id', 'headerId');
+      row.find("td").each(function(cellIndex) {
+        	iterator = iterator + 1;
+        	option = "<option value="+iterator+">" +$(this).text()+"</option>";
+           	dropdown(option);
+      });
+
+
+
+    	
+    }
+    function dropdown(option)
+    {
+    	
+
+  		$("#project").append(option);
+    }
+    function Show()
+    {
+    	
+    	var selected = $("#project").val();
+    	if(selected == 0)
+    	{
+    		var row = $("#tableForJsonData").find("tr:first");
+    	var iterator = 0;
+    row.find("td").each(function(cellIndex) {
+        	iterator = iterator + 1;
+        	$('td:nth-child(' + iterator + ')').show();
+    });
+    	}
+    	else
+    	{
+    	
+    	$('td:nth-child(' + selected + ')').show();
+    	}
+   }
+    function Hide()
+    {
+    	var selected = $("#project").val();
+    	if(selected == 0)
+    	{
+    		var row = $("#tableForJsonData").find("tr:first");
+    	var iterator = 1;
+    row.find("td").each(function(cellIndex) {
+        	iterator = iterator + 1;
+        	$('td:nth-child(' + iterator + ')').hide();
+    });
+    	}
+    	else
+    	{
+    	
+    	$('td:nth-child(' + selected + ')').hide();
+    	}
+    }
+    
+    </script>
+  
+
+   </body>
+</html>
