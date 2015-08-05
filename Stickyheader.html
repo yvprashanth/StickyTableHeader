@@ -10,12 +10,12 @@
 	<script text="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js"></script>
 </head>
 <body>
-
-
 		<section class="demo" id="basic">
 			<h2>Basic Usage</h2>
 			<p>Here is a basic table, populated with data provided by <a href="http://randomuser.me/">Random User Generator (v0.2)</a>. Setting up is easy-peasy:</p>
-			
+			<button type="button" class="btn btn-success" id = "show" onclick = "Show()">show</button>
+			<button type="button" class="btn btn-danger" id = "hide" onclick = "Hide()">hide</button>
+			<br/><br>
 			<table>
 				<thead>
 					<tr>
@@ -58,6 +58,9 @@
 					<tr><td class="user-avatar"><img src="http://api.randomuser.me/0.2/portraits/men/1.jpg" alt="angel barnes" title="angel barnes" /></td><td class="user-name">angel barnes</td><td class="user-email">angel.barnes96@example.com</td><td class="user-phone">(773)-363-7896</td><td class="user-location">belen, vermont</td></tr>
 				</tbody>
 			</table>
+
+			<table id="tableForJsonData">
+            </table>
 		</section>	
 
 		<footer>
@@ -67,9 +70,164 @@
 			<script>
 				$(function () {
 					// We select for tables universally - you can change the selector to target the tables you want
-					// Basic table
-					$('#basic table').stickySort();
+					// Basic table					
+
+					$("#tableForJsonData td").hover(function(){
+			      		var i = $(this).index();
+			      		var a = $('td:first', $(this).parents('tr')).text();
+			      		 
+			      		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();
+			     			
+			      		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
+			      	}, function(){      		
+			      		$(this).find("span").remove();
+			      		$(this).find("br").remove();			      		
+			      	});
+
+					$.getJSON("Scripts/values.json", function (data) {
+					        var columns = addColumnHeaders(data);        
+					              for (var i = 0; i < data.length; i++) {              
+					                  var iteration = i;
+					                  var row$ = $('<tr/>');
+					                  
+					                  for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+					                  
+					                  var cellValue = data[i][columns[colIndex]];
+					                  
+					                  if (cellValue == null) { cellValue = ""; }
+					                  
+					                  //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
+					                   //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
+					                  if(colIndex == 0)
+					                  {
+					                    row$.append($('<td/>').html(cellValue));
+					                  }
+					                  else
+					                  {
+					                    row$.append($('<td/>').html(cellValue));
+					                  }
+					                  
+					                  }
+					                  $("#tableForJsonData").append(row$);
+					              }
+					        
+					            transpose();
+					            addCheckbox();
+
+					            $("#headerId").css("color", "red");
+					            $("#headerId").css("font-weight", "bold");
+					            $("#headerId").css("font-size", "20px");
+					            $("tr:first-child td").each(function() {
+					                $(this).replaceWith('<th>' + $(this).text() + '</th>'); 
+					            });
+					            var firstHeader = $('#tableForJsonData tr:first');
+					            // var tempBlah = '<thead>' + firstHeader[0] + '</thead>';
+					            $('table').each(function(){
+					                $(this).prepend('<thead></thead>')
+					                $(this).find('thead').append($(this).find("tr:eq(0)"));
+					            });
+
+					            $('#tableForJsonData').removeAttr( "id" );
+
+					            $('div#basic').removeAttr('id');
+
+					            $('table').stickySort();
+					            // $('#tableForJsonData table').stickySort();
+					            // $('#tableForJsonData tr:first').remove();
+					    });						
+
+						var temp = $('#basic table');
+						// debugger;
+						// temp[1].removeAttr('id');
+						
+						$('#basic table').stickySort();
 				});
+
+				function addColumnHeaders(list) {
+				        var columnSet = [];
+				        var header$ = $('<tr/>');
+				     
+				        for (var i = 0; i < list.length; i++) {
+				            var rowHash = list[i];
+				            for (var key in rowHash) {
+				                if ($.inArray(key, columnSet) == -1) {
+				                    columnSet.push(key);
+				                    header$.append($('<td/>').html(key));
+				                }
+				            }
+				        }
+				        $("#tableForJsonData").append(header$);				     
+				        return columnSet;
+				}
+
+				function transpose() {          
+                          var $this = $("#tableForJsonData");
+                          var count = 0;
+                          var newrows = [];
+                          $this.find("tr").each(function(){
+                                                var i = 0;
+                                                $(this).find("td").each(function(){
+                                                                        i++;
+                                                                        if(newrows[i] === undefined) { 
+                                                                        
+                                                                        newrows[i] = $("<tr></tr>");
+                                                                        
+                                                                         }
+                                                                        newrows[i].append($(this));
+                                                                        });
+                                                });
+                          $this.find("tr").remove();
+                          $.each(newrows, function(){
+                                 	$this.append(this);                                 
+                          });                         
+      			}
+
+      			function addCheckbox(){
+			    	var option = "<option value=\"0\"> All Projects </option>";
+			    	dropdown(option);
+			    	var iterator = 0;
+			    	var row = $("#tableForJsonData").find("tr:first");
+			    	row.attr('id', 'headerId');
+			        row.find("td").each(function(cellIndex) {
+			        	iterator = iterator + 1;
+			        	option = "<option value="+iterator+">" +$(this).text()+"</option>";
+			           	dropdown(option);
+			        });
+			    }
+
+			    function Show() {    	
+			    	var selected = $("#project").val();
+			    	if(selected == 0)
+			    	{
+			    		var row = $("#tableForJsonData").find("tr:first");
+			        	var iterator = 0;
+			              row.find("td").each(function(cellIndex) {
+			              	iterator = iterator + 1;
+			              	$('td:nth-child(' + iterator + ')').show();
+			              });
+			    	}
+			    	else
+			    	{    	 
+			    	   $('td:nth-child(' + selected + ')').show();
+			    	}
+			    }
+
+			   	function Hide(){
+			    	var selected = $("#project").val();
+			    	if(selected == 0)
+			    	{
+			    		var row = $("#tableForJsonData").find("tr:first");
+			    	    var  iterator = 1;
+			          	row.find("td").each(function(cellIndex) {
+				        	iterator = iterator + 1;
+				        	$('td:nth-child(' + iterator + ')').hide();
+			    		});
+			    	}
+			    	else{			    	
+			    		$('td:nth-child(' + selected + ')').hide();
+			    	}
+			    }
+
 			</script>
 		</footer>
 </body>

@@ -42,14 +42,9 @@
 <button type="button" class="btn btn-success" id = "show" onclick = "Show()">show</button>
 <button type="button" class="btn btn-danger" id = "hide" onclick = "Hide()">hide</button>
 <br/><br>
+                          <table id="tableForJsonData" class = "table table-bordered sticky-enabled">                          
 
-                          <div class="sticky-wrap">
-                          <table id="tableForJsonData" class = "table table-bordered sticky-enabled">
-                          
-
-       </table>
-        </div>
-            
+                          </table>
          </section>
       </section>
       </section>
@@ -80,6 +75,7 @@
      
         return columnSet;
     }
+
       function transpose() {
           
                           var $this = $("#tableForJsonData");
@@ -108,58 +104,51 @@
                           		
                                  $this.append(this);
                                  
-                                 });
-                          
-                          
-
-
+                                 });                         
       }
      
 
 $(document).ready(function(){
     	$("#tableForJsonData td").hover(function(){
-    		var i = $(this).index();
-    		var a = $('td:first', $(this).parents('tr')).text();
-    		 
-    		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();
-   			
-    		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
-    	}, function(){
-    		
-    		$(this).find("span").remove();
-    		$(this).find("br").remove();
-    		
-    	});
+      		var i = $(this).index();
+      		var a = $('td:first', $(this).parents('tr')).text();
+      		 
+      		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();
+     			
+      		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
+      	}, function(){      		
+      		$(this).find("span").remove();
+      		$(this).find("br").remove();
+      		
+      	});
     });
 	
 		$.getJSON("Scripts/values.json", function (data) {
-        var columns = addColumnHeaders(data);
-        
-              for (var i = 0; i < data.length; i++) {
-              
-              var iteration = i;
-              var row$ = $('<tr/>');
-              
-              for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-              
-              var cellValue = data[i][columns[colIndex]];
-              
-              if (cellValue == null) { cellValue = ""; }
-              
-              //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
-               //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
-              if(colIndex == 0)
-              {
-                row$.append($('<td/>').html(cellValue));
+        var columns = addColumnHeaders(data);        
+              for (var i = 0; i < data.length; i++) {              
+                  var iteration = i;
+                  var row$ = $('<tr/>');
+                  
+                  for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                  
+                  var cellValue = data[i][columns[colIndex]];
+                  
+                  if (cellValue == null) { cellValue = ""; }
+                  
+                  //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
+                   //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
+                  if(colIndex == 0)
+                  {
+                    row$.append($('<td/>').html(cellValue));
+                  }
+                  else
+                  {
+                    row$.append($('<td/>').html(cellValue));
+                  }
+                  
+                  }
+                  $("#tableForJsonData").append(row$);
               }
-              else
-              {
-                row$.append($('<td/>').html(cellValue));
-              }
-              
-              }
-              $("#tableForJsonData").append(row$);
-        }
         
             transpose();
             addCheckbox();
@@ -196,44 +185,39 @@ $(document).ready(function(){
         	option = "<option value="+iterator+">" +$(this).text()+"</option>";
            	dropdown(option);
       });
-
-
-
-    	
     }
     function dropdown(option)
     {
-    	
-
   		$("#project").append(option);
     }
+
     function Show()
-    {
-    	
+    {    	
     	var selected = $("#project").val();
     	if(selected == 0)
     	{
     		var row = $("#tableForJsonData").find("tr:first");
-    	var iterator = 0;
-    row.find("td").each(function(cellIndex) {
-        	iterator = iterator + 1;
-        	$('td:nth-child(' + iterator + ')').show();
-    });
+        	var iterator = 0;
+              row.find("td").each(function(cellIndex) {
+              	iterator = iterator + 1;
+              	$('td:nth-child(' + iterator + ')').show();
+              });
     	}
     	else
-    	{
-    	
-    	$('td:nth-child(' + selected + ')').show();
+    	{    	 
+    	   $('td:nth-child(' + selected + ')').show();
     	}
    }
+
+
     function Hide()
     {
     	var selected = $("#project").val();
     	if(selected == 0)
     	{
-    		var row = $("#tableForJsonData").find("tr:first");
-    	var iterator = 1;
-    row.find("td").each(function(cellIndex) {
+    		   var row = $("#tableForJsonData").find("tr:first");
+    	     var  iterator = 1;
+          row.find("td").each(function(cellIndex) {
         	iterator = iterator + 1;
         	$('td:nth-child(' + iterator + ')').hide();
     });
@@ -245,8 +229,6 @@ $(document).ready(function(){
     	}
     }
     
-    </script>
-  
-
+    </script>  
    </body>
 </html>
