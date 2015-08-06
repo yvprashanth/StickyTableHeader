@@ -11,14 +11,14 @@
 </head>
 <body>
 		<section class="demo" id="basic">
-			<h2>Basic Usage</h2>
-			<p>Here is a basic table, populated with data provided by <a href="http://randomuser.me/">Random User Generator (v0.2)</a>. Setting up is easy-peasy:</p>
 			<button type="button" class="btn btn-success" id = "show" onclick = "Show()">show</button>
 			<button type="button" class="btn btn-danger" id = "hide" onclick = "Hide()">hide</button>
 			<br/><br>
-	
+	    <select id = "project">
+  
+</select>
 
-			<table id="tableForJsonData">
+			<table id="tableForJsonData" class="overflow-both">
             </table>
 		</section>	
 
@@ -32,40 +32,33 @@
 					// Basic table					
 
 					$("#tableForJsonData td").hover(function(){
-			      		var i = $(this).index();
-			      		var a = $('td:first', $(this).parents('tr')).text();
-			      		 
-			      		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();
-			     			
-			      		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
-			      	}, function(){      		
+				      		var i = $(this).index();
+				      		var a = $('td:first', $(this).parents('tr')).text();				      		 
+				      		var b =  $('#tableForJsonData tr').eq(0).find('td').eq(i).text();				     			
+				      		$(this).append($("<br><span class=\"label label-info\">("+ a +", "+b+")</span>"));
+			      		}, function(){      		
 			      		$(this).find("span").remove();
 			      		$(this).find("br").remove();			      		
 			      	});
 
 					$.getJSON("Scripts/values.json", function (data) {
-					        var columns = addColumnHeaders(data);        
+					        var columns = addColumnHeaders(data);       					        	  
 					              for (var i = 0; i < data.length; i++) {              
 					                  var iteration = i;
-					                  var row$ = $('<tr/>');
-					                  
-					                  for (var colIndex = 0; colIndex < columns.length; colIndex++) {
-					                  
-					                  var cellValue = data[i][columns[colIndex]];
-					                  
-					                  if (cellValue == null) { cellValue = ""; }
-					                  
-					                  //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
-					                   //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
-					                  if(colIndex == 0)
-					                  {
-					                    row$.append($('<td/>').html(cellValue));
-					                  }
-					                  else
-					                  {
-					                    row$.append($('<td/>').html(cellValue));
-					                  }
-					                  
+					                  var row$ = $('<tr/>');					                  
+					                  for (var colIndex = 0; colIndex < columns.length; colIndex++) {					               
+						                  var cellValue = data[i][columns[colIndex]];					                  
+						                  if (cellValue == null) { cellValue = ""; }					                  
+						                  //var input = $("<input type = \"checkbox\" id ="+(iteration+1)+" class = \"hideProject\"/>");
+						                   //var input = $("<input type= \"checkbox\" id= " +(i+2)+ " class=\"hideProject\" onclick = \"hide(this)\" />");
+						                  if(colIndex == 0)
+						                  {
+						                    row$.append($('<td/>').html(cellValue));
+						                  }
+						                  else
+						                  {
+						                    row$.append($('<td/>').html(cellValue));
+						                  }					                  
 					                  }
 					                  $("#tableForJsonData").append(row$);
 					              }
@@ -86,15 +79,24 @@
 					                $(this).find('thead').append($(this).find("tr:eq(0)"));
 					            });
 
+								changeFirstCol();
 					            $('#tableForJsonData').removeAttr( "id" );
 
 					            $('div#basic').removeAttr('id');
 
 					            $('table').stickySort();
+					            
 					            // $('#tableForJsonData table').stickySort();
 					            // $('#tableForJsonData tr:first').remove();
 					    });						
 				});
+
+				function changeFirstCol(){
+					var table = $('#tableForJsonData');
+					$('tr td:nth-child(1)').replaceWith(function(){
+					    return $("<th />").append($(this).contents());
+					});
+				}
 
 				function addColumnHeaders(list) {
 				        var columnSet = [];
@@ -120,15 +122,14 @@
 
 				function transpose() {          
                           var $this = $("#tableForJsonData");
-                          var count = 0;
+                          var count = 0;                          
                           var newrows = [];
                           $this.find("tr").each(function(){
                                                 var i = 0;
                                                 $(this).find("td").each(function(){
                                                                         i++;
                                                                         if(newrows[i] === undefined) { 
-                                                                        
-                                                                        newrows[i] = $("<tr></tr>");
+                                                                        	newrows[i] = $("<tr></tr>");
                                                                         
                                                                          }
                                                                         newrows[i].append($(this));
